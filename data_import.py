@@ -6,6 +6,7 @@ import argparse
 import datetime
 import math
 import copy
+import sys
 
 
 class ImportData:
@@ -138,8 +139,37 @@ def roundTimeArray(obj, res):
 
 
 def printArray(data_list, annotation_list, base_name, key_file):
+    data_list1 = []
+    data_list2 = []
+    annotation_list1 = []
+    annotation_list2 = []
     # combine and print on the key_file
-    pass
+    if not (key_file in annotation_list):
+        print('Cannot find sort_key')
+        return -1
+    else:
+        for i in range(len(annotation_list)):
+            if (annotation_list[i] == key_file):
+                annotation_list1.append(annotation_list[i])
+                data_list1.append(data_list[i])
+            else:
+                annotation_list2.append(annotation_list[i])
+                data_list2.append(data_list[i])
+
+    attributes = ['time', key_file] + annotation_list2
+    with open(base_name + '.csv', mode='w') as output:
+        writer = csv.writer(output, delimiter=',')
+        writer.writerow(attributes)
+        for (t, v) in data_list1[0]:
+            rest_values = []
+            for data in data_list2:
+                old_len = len(rest_values)
+                for (zt, zv) in data:
+                    if (t == zt):
+                        rest_values.append(zv)
+                if (len(rest_values) == old_len):
+                    rest_values.append(0)
+            writer.writerow([t, v] + rest_values)
 
 
 if __name__ == '__main__':
@@ -162,12 +192,20 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # pull all the folders in the file
-    files_lst = listdir(args.folder_name)  # list the folders
+    try:
+        files_lst = listdir(args.folder_name)  # list the folders
+    except (FileNotFoundError, NameError) as e:
+        print('Cannot find folder')
+        sys.exit(1)
 
     # import all the files into a list of ImportData objects (in a loop!)
     data_lst = []
     for f in files_lst:
         data_lst.append(ImportData(args.folder_name + '/' + f))
+        
+    if (len(data_lst) == 0):
+        print('no valid data')
+        sys.exit(1)
 
     # create two new lists of zip objects
     # do this in a loop, where you loop through the data_lst
@@ -177,8 +215,13 @@ if __name__ == '__main__':
 
     data_15 = []  # a list with time rounded to 15min
     for obj in data_lst:
-        data_5.append(roundTimeArray(obj, 15))
+        data_15.append(roundTimeArray(obj, 15))
 
     # print to a csv file
-    printArray(data_5, files_lst, args.output_file+'_5', args.sort_key)
-    printArray(data_15, files_lst, args.output_file+'_15', args.sort_key)
+    r = printArray(data_5, files_lst, args.output_file+'_5', args.sort_key)
+    if (r == -1):
+        sys.exit(1)
+
+    r = printArray(data_15, files_lst, args.output_file+'_15', args.sort_key)
+    if (r == -1):
+        sys.exit(1)
