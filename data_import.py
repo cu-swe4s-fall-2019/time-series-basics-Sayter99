@@ -11,7 +11,8 @@ class ImportData:
         self._time = []
         self._value = []
 
-        # open file, create a reader from csv.DictReader, and read input times and values
+        # open file, create a reader from csv.DictReader,
+        # and read input times and values
         with open(data_csv) as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
@@ -88,8 +89,10 @@ def printArray(data_list, annotation_list, base_name, key_file):
 if __name__ == '__main__':
 
     # adding arguments
-    parser = argparse.ArgumentParser(description='A class to import, combine, and print data from a folder.',
-                                     prog='dataImport')
+    parser = argparse.ArgumentParser(
+        description='A class to import, combine, ' +
+                    'and print data from a folder.',
+        prog='dataImport')
 
     parser.add_argument('--folder_name', type=str, help='Name of the folder')
 
