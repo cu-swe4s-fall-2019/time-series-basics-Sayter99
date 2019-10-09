@@ -11,7 +11,8 @@ class ImportData:
         self._time = []
         self._value = []
 
-        # open file, create a reader from csv.DictReader, and read input times and values
+        # open file, create a reader from csv.DictReader,
+        # and read input times and values
         with open(data_csv) as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
@@ -21,13 +22,49 @@ class ImportData:
     def linear_search_value(self, key_time):
         # return list of value(s) associated with key_time
         # if none, return -1 and error message
-        pass
+        result = []
+        for i in range(len(self._time)):
+            if self._time[i] == key_time:
+                result.append(self._value[i])
+        if (len(result) == 0):
+            print('Cannot find any value associated with key_time')
+            return -1
+        return result
 
     def binary_search_value(self, key_time):
         # optional extra credit
         # return list of value(s) associated with key_time
         # if none, return -1 and error message
-        pass
+        result = []
+        low = 0
+        high = len(self._time) - 1
+        while low < high:
+            mid = (low + high) // 2
+            if (self._time[mid] == key_time):
+                result.append(self._value[mid])
+                left = mid - 1
+                while left > 0:
+                    if self._time[left] == key_time:
+                        result.append(self._value[left])
+                        left = left - 1
+                    else:
+                        break
+                right = mid + 1
+                while right < len(self._time):
+                    if self._time[right] == key_time:
+                        result.append(self._value[right])
+                        right = right + 1
+                    else:
+                        break
+            elif (self._time[mid] < key_time):
+                left = mid + 1
+            else:
+                right = mid - 1
+
+        if (len(result) == 0):
+            print('Cannot find any value associated with key_time')
+            return -1
+        return result
 
 
 def roundTimeArray(obj, res):
@@ -52,8 +89,10 @@ def printArray(data_list, annotation_list, base_name, key_file):
 if __name__ == '__main__':
 
     # adding arguments
-    parser = argparse.ArgumentParser(description='A class to import, combine, and print data from a folder.',
-                                     prog='dataImport')
+    parser = argparse.ArgumentParser(
+        description='A class to import, combine, ' +
+                    'and print data from a folder.',
+        prog='dataImport')
 
     parser.add_argument('--folder_name', type=str, help='Name of the folder')
 
