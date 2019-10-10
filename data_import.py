@@ -7,6 +7,7 @@ import datetime
 import math
 import copy
 import sys
+import time
 
 
 class ImportData:
@@ -20,7 +21,7 @@ class ImportData:
             self._type = 0
 
         elif ('smbg' in data_csv or 'hr' in data_csv or
-              'cgn' in data_csv or 'basal' in data_csv):
+              'cgm' in data_csv or 'basal' in data_csv):
             self._type = 1
 
         # open file, create a reader from csv.DictReader,
@@ -39,6 +40,10 @@ class ImportData:
                         self._time.append(tm)
                 except ValueError:
                     print('Invalid value: ' + row['value'])
+
+        if (self._time[-1] < self._time[0]):
+            self._time.reverse()
+            self._value.reverse()
 
     def linear_search_value(self, key_time):
         # return list of value(s) associated with key_time
@@ -61,28 +66,31 @@ class ImportData:
         result = []
         low = 0
         high = len(self._time) - 1
-        while low < high:
+        mid = -1
+        while low <= high:
             mid = (low + high) // 2
             if (self._time[mid] == key_time):
-                result.append(self._value[mid])
-                left = mid - 1
-                while left > 0:
-                    if self._time[left] == key_time:
-                        result.append(self._value[left])
-                        left = left - 1
-                    else:
-                        break
-                right = mid + 1
-                while right < len(self._time):
-                    if self._time[right] == key_time:
-                        result.append(self._value[right])
-                        right = right + 1
-                    else:
-                        break
+                break
             elif (self._time[mid] < key_time):
                 low = mid + 1
             else:
                 high = mid - 1
+
+        result.append(self._value[mid])
+        left = mid - 1
+        while left >= 0:
+            if self._time[left] == key_time:
+                result.append(self._value[left])
+                left = left - 1
+            else:
+                break
+        right = mid + 1
+        while right < len(self._time):
+            if self._time[right] == key_time:
+                result.append(self._value[right])
+                right = right + 1
+            else:
+                break
 
         if (len(result) == 0):
             print('Cannot find any value associated with key_time')
@@ -118,7 +126,7 @@ def roundTimeArray(obj, res):
 
     if time_entries > 0:
         round_lst.append(round_obj._time[0])
-        search_result = round_obj.linear_search_value(round_obj._time[i])
+        search_result = round_obj.binary_search_value(round_obj._time[0])
         if (obj._type == 0):
             values.append(sum(search_result))
         elif (obj._type == 1):
@@ -129,7 +137,7 @@ def roundTimeArray(obj, res):
             continue
         else:
             round_lst.append(round_obj._time[i])
-            search_result = round_obj.linear_search_value(round_obj._time[i])
+            search_result = round_obj.binary_search_value(round_obj._time[i])
             if obj._type == 0:
                 values.append(sum(search_result))
             elif obj._type == 1:
@@ -202,20 +210,28 @@ if __name__ == '__main__':
     data_lst = []
     for f in files_lst:
         data_lst.append(ImportData(args.folder_name + '/' + f))
-        
+
     if (len(data_lst) == 0):
         print('no valid data')
         sys.exit(1)
 
     # create two new lists of zip objects
     # do this in a loop, where you loop through the data_lst
+    start_time = time.time()
     data_5 = []  # a list with time rounded to 5min
     for obj in data_lst:
         data_5.append(roundTimeArray(obj, 5))
+    end_time = time.time()
+    print('data_5:')
+    print(end_time - start_time)
 
+    start_time = time.time()
     data_15 = []  # a list with time rounded to 15min
     for obj in data_lst:
         data_15.append(roundTimeArray(obj, 15))
+    end_time = time.time()
+    print('data_15:')
+    print(end_time - start_time)
 
     # print to a csv file
     r = printArray(data_5, files_lst, args.output_file+'_5', args.sort_key)
