@@ -37,6 +37,17 @@ class TestDataImport(unittest.TestCase):
         self.assertEqual(len(obj._time), len(obj._value))
         os.remove('out.csv')
 
+    def test_replacement(self):
+        f = open('replace.csv', 'w')
+        f.write('time,value\n')
+        f.write('3/15/18 3:06,low\n')
+        f.write('3/15/18 4:06,high')
+        f.close()
+        obj = data_import.ImportData('replace.csv')
+        self.assertEqual(obj._value[0], 40)
+        self.assertEqual(obj._value[1], 300)
+        os.remove('replace.csv')
+
     def test_round_time(self):
         filename = './smallData/cgm_small.csv'
         obj = data_import.ImportData(filename)

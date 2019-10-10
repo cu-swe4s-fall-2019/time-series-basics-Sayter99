@@ -48,9 +48,10 @@ class ImportData:
                 except ValueError:
                     print('Invalid value: ' + row['value'])
 
-        if (self._time[-1] < self._time[0]):
-            self._time.reverse()
-            self._value.reverse()
+        if (len(self._time) > 0):
+            if (self._time[-1] < self._time[0]):
+                self._time.reverse()
+                self._value.reverse()
 
     def linear_search_value(self, key_time):
         # return list of value(s) associated with key_time
