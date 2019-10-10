@@ -34,6 +34,13 @@ class ImportData:
                 tm = (datetime.datetime.strptime(
                     row['time'], '%m/%d/%y %H:%M'))
                 try:
+                    if (row['value'] == 'low'):
+                        print('converting low to 40')
+                        row['value'] = 40
+                    elif (row['value'] == 'high'):
+                        print('converting high to 300')
+                        row['value'] = 300
+
                     v = float(row['value'])
                     if (not math.isnan(v)):
                         self._value.append(v)
