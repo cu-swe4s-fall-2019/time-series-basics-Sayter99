@@ -7,6 +7,7 @@ import datetime
 import math
 import copy
 import sys
+import time
 
 
 class ImportData:
@@ -39,7 +40,7 @@ class ImportData:
                         self._time.append(tm)
                 except ValueError:
                     print('Invalid value: ' + row['value'])
-        
+
         if (self._time[-1] < self._time[0]):
             self._time.reverse()
             self._value.reverse()
@@ -216,13 +217,21 @@ if __name__ == '__main__':
 
     # create two new lists of zip objects
     # do this in a loop, where you loop through the data_lst
+    start_time = time.time()
     data_5 = []  # a list with time rounded to 5min
     for obj in data_lst:
         data_5.append(roundTimeArray(obj, 5))
+    end_time = time.time()
+    print('data_5:')
+    print(end_time - start_time)
 
+    start_time = time.time()
     data_15 = []  # a list with time rounded to 15min
     for obj in data_lst:
         data_15.append(roundTimeArray(obj, 15))
+    end_time = time.time()
+    print('data_15:')
+    print(end_time - start_time)
 
     # print to a csv file
     r = printArray(data_5, files_lst, args.output_file+'_5', args.sort_key)

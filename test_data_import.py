@@ -17,6 +17,13 @@ class TestDataImport(unittest.TestCase):
         result = obj.linear_search_value(d)
         self.assertEqual(result, [0])
 
+    def test_binary_search(self):
+        filename = './smallData/activity_small.csv'
+        obj = data_import.ImportData(filename)
+        d = datetime.datetime(2018, 3, 12, 0, 0, 0, 0)
+        result = obj.linear_search_value(d)
+        self.assertEqual(result, [0])
+
     def test_import_robustness(self):
         filename = './smallData/cgm_small.csv'
         print('Replacing 40 with low and 300 with high')
